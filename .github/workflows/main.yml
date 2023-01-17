@@ -1,9 +1,20 @@
-- name: First interaction
-  uses: actions/first-interaction@v1.1.1
-  with:
-    # Token for the repository. Can be passed in using {{ secrets.GITHUB_TOKEN }}
-    repo-token: 
-    # Comment to post on an individual's first issue
-    issue-message: # optional
-    # Comment to post on an individual's first pull request
-    pr-message: # optional
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build application
+      run: npm run build
+    - name: Deploy to production
+      uses: actions/aws-actions/deploy-to-ecs@v1
+      with:
+        region: us-west-2
+        task-definition: production-task-definition
+        service: production-service
+        cluster: production-cluster
